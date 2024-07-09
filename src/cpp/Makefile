@@ -15,7 +15,7 @@ INCLUDE = -I$(JSONBASE)
 SOURCES = hello_triangle.cpp events.cpp camera.cpp
 
 # Output file
-OUTPUT = ../hello_triangle.js
+OUTPUT = ../em_main.js
 
 # Default target
 all: $(OUTPUT)

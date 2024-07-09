@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && mkdir dist/src && cp src/hello_triangle.js dist/src ",
+    "build": "vite build && cd src/cpp && make clean && make && cd ../../ && mkdir dist/src && cp src/em_main.js dist/src",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },

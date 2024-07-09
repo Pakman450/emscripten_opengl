@@ -15,7 +15,7 @@ export default function OpenGLCanvas({ exampleProp }) {
     };
 
     const script = document.createElement('script');
-    script.src = 'src/hello_triangle.js';
+    script.src = 'src/em_main.js';
     script.async = true;
 
 
