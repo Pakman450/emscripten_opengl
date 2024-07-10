@@ -1,7 +1,6 @@
 #include <SDL2/SDL.h>
-#include <glad/glad.h>
-
 #include <emscripten.h>
+#include <GLES3/gl3.h>
 
 // Standard C++ Lib
 #include <iostream>
@@ -178,12 +177,6 @@ void InitializeProgram(){
 
     if (gOpenGLContext==nullptr){
         std::cout << "SDL_Context not available\n";
-        exit(1);
-    }
-
-    // initialize Glad Library
-    if (!gladLoadGLLoader(SDL_GL_GetProcAddress)){
-        std::cout << "Glad is not initialized\n";
         exit(1);
     }
 
