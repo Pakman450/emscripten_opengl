@@ -23,6 +23,8 @@
 
 #include "events.h"
 #include <iostream>
+
+
 #include <nlohmann/json.hpp> // Include the JSON library header
 
 // Vertex shader
@@ -41,6 +43,22 @@ const GLchar* vertexSource =
     "    gl_Position.y *= aspect;                  \n"
     "    color = gl_Position.xyz + vec3(0.5);      \n"
     "}                                             \n";
+
+const GLchar* vertexSource2 =
+    "uniform vec2 pan;                             \n"
+    "uniform float zoom;                           \n"
+    "uniform float aspect;                         \n"
+    "attribute vec4 position;                      \n"
+    "varying vec3 color;                           \n"
+    "void main()                                   \n"
+    "{                                             \n"
+    "    gl_Position = vec4(position.xyz, 1.0);    \n"
+    "    gl_Position.xy += pan;                    \n"
+    "    gl_Position.xy *= zoom;                   \n"
+    "    gl_Position.y *= aspect;                  \n"
+    "    color = gl_Position.xyz + vec3(0.5);      \n"
+    "}                                             \n";
+    
 
 // Fragment/pixel shader
 const GLchar* fragmentSource =
@@ -63,9 +81,14 @@ void updateShader(EventHandler& eventHandler)
 GLuint initShader(EventHandler& eventHandler)
 {
     // Create and compile vertex shader
+    // Gluint is unsigned integer type
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexSource, NULL);
     glCompileShader(vertexShader);
+
+    // GLuint vertexShader2 = glCreateShader(GL_VERTEX_SHADER);
+    // glShaderSource(vertexShader2, 1, &vertexSource2, NULL);
+    // glCompileShader(vertexShader2);
 
     // Create and compile fragment shader
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -75,6 +98,8 @@ GLuint initShader(EventHandler& eventHandler)
     // Link vertex and fragment shader into shader program and use it
     GLuint shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
+    // glAttachShader(shaderProgram, vertexShader2);
+
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
     glUseProgram(shaderProgram);
@@ -96,9 +121,9 @@ void initGeometry(GLuint shaderProgram)
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     GLfloat vertices[] = 
     {
-        0.0f, 0.5f, 0.0f,
+        0.0f, 0.2f, 1.f,
         -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f
+        0.5f, -0.7f, 0.0f
     };
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 

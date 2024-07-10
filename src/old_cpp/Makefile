@@ -1,18 +1,19 @@
 # Makefile for compiling hello_triangle with Emscripten
 
 # Compiler
-EMCC = em++
+EMCC = emcc
 
 # Compiler flags
 CXXFLAGS = -std=c++11
 EMFLAGS = -s USE_SDL=2 -s FULL_ES3 -s WASM=0 -s ENVIRONMENT=web
 
 # Where the nlohmann-json libraries are
-INCLUDE = -I./glad/include
+INCLUDE = -I$(JSONBASE)
 
 
 # Source files
-SOURCES = main.cpp ./glad/src/glad.c
+SOURCES = hello_triangle.cpp events.cpp camera.cpp
+
 # Output file
 OUTPUT = ../em_main.js
 
