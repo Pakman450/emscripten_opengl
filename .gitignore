@@ -23,4 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-em_main.js
+src/cpp/em_main.js
+src/cpp/em_main.data
+
+
