@@ -9,7 +9,30 @@
 #include <fstream>
 
 //////////
-// Globals
+// GlOBALS
+
+
+// ERROR HANDLING ROUTINES
+
+static void GLClearAllErrors(){
+    while(glGetError() != GL_NO_ERROR){
+
+
+    }
+}
+
+//returns true if error
+static bool GLCheckErrorStatus( const char* function, int line){
+    while(GLenum error = glGetError()){
+        std::cout << "OpenGL Error: " << error << "\tLine: "<< line
+                  << "\tfunction: "<< function <<std::endl;
+        return true;
+    }
+    return false;
+}
+
+#define GLCheck(x) GLClearAllErrors(); x; GLCheckErrorStatus(#x,__LINE__);
+
 int gScreenHeight = 480;
 int gScreenWidth = 640;
 SDL_Window*   gGraphicsApplicationWindow = nullptr;
@@ -267,13 +290,13 @@ void Draw(){
     //             3, //start at index 3 or the second triangle
     //             3); // and we are rendering up to 3 elements becuase it is a triangle
 
-    
+
     // Draw a quad based on index-based array drawing
-    glDrawElements(GL_TRIANGLES, 
+    GLCheck(glDrawElements(GL_TRIANGLES, 
                  6, // number of elements in your index buffer object
-                 GL_UNSIGNED_INT, // type of data
+                 GL_INT, // type of data
                  0 // no offset
-                 );
+                 ););
 
     
 }
