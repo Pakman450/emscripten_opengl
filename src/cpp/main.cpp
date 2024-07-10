@@ -8,8 +8,8 @@
 #include <string>
 #include <fstream>
 
+//////////
 // Globals
-// 
 int gScreenHeight = 480;
 int gScreenWidth = 640;
 SDL_Window*   gGraphicsApplicationWindow = nullptr;
@@ -21,11 +21,13 @@ GLuint gVertexArrayObject = 0;
 
 //Vertex Buffer Object
 GLuint gVertexBufferObject = 0;
-
+GLuint gVertexBufferObject2 = 0;
 // Program Object for out shaders
 GLuint gGraphicsPipelineShaderProgram = 0;
 
 // Globals end
+///////////
+
 std::string LoadShaderAsString( const std::string& filename){
 
     // REsulting shader program loaded as a single string
@@ -107,13 +109,11 @@ void CreateGraphicsPipeline(){
 }
 
 void GetOpenGLVersionInfo(){
-
     std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
     std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
     std::cout << "Version: " << glGetString(GL_VERSION) << std::endl;
     std::cout << "Shading Language: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 }
-
 
 // 
 void VertexSpecification(){
@@ -122,9 +122,12 @@ void VertexSpecification(){
         -0.8f, -0.8f, 0.0f, // vertex 1
          0.8f, -0.8f, 0.0f, // vertex 2
          0.0f,  0.8f, 0.0f, // vertex 3
-        -0.8f, -0.5f, 1.0f, // vertex 1
-         0.8f, -0.3f, 0.0f, // vertex 2
-         0.0f,  0.2f, 0.0f, // vertex 3
+    };
+
+    const std::vector<GLfloat> vertexColors{
+         1.0f, 0.0f, 0.0f, // vertex 1
+         0.0f, 1.0f, 0.0f, // vertex 2
+         0.0f, 0.0f, 1.0f // vertex 3
     };
 
     // We start setting things up on the GPU
@@ -143,7 +146,7 @@ void VertexSpecification(){
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0,
-                          3,
+                          3, // x y z
                           GL_FLOAT,
                           GL_FALSE,
                           0,
@@ -151,9 +154,33 @@ void VertexSpecification(){
                           );
 
 
+
+
+
+
+    // Start generting out VBO2
+    glGenBuffers(1, &gVertexBufferObject2);
+
+    glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject2);
+
+    glBufferData(GL_ARRAY_BUFFER, 
+                 vertexColors.size()*sizeof(GLfloat),
+                 vertexColors.data(), 
+                 GL_STATIC_DRAW);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1,
+                          3, // r g b
+                          GL_FLOAT,
+                          GL_FALSE,
+                          0,
+                          (void*)0
+                          );
+
     glBindVertexArray(0);
 
     glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+
 };
 
 
@@ -219,7 +246,6 @@ void Draw(){
     glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
-    glDrawArrays(GL_TRIANGLES, 3, 3);
 }
 void MainLoop(void* mainLoopArg){
 
