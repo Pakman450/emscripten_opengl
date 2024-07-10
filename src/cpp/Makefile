@@ -5,16 +5,16 @@ EMCC = em++
 
 # Compiler flags
 CXXFLAGS = -std=c++11
-EMFLAGS = -s USE_SDL=2 -s FULL_ES3 -s WASM=0 -s ENVIRONMENT=web
+SHADERFLAGS = --embed-file shaders --no-entry
+EMFLAGS = -s USE_SDL=2 -s FULL_ES3 -s WASM=0 -s ENVIRONMENT=web $(SHADERFLAGS)
 
 # Where the nlohmann-json libraries are
 INCLUDE =
 
-
 # Source files
 SOURCES = main.cpp
 # Output file
-OUTPUT = ../em_main.js
+OUTPUT = em_main.js
 
 # Default target
 all: $(OUTPUT)

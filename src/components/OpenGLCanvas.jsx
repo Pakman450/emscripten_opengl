@@ -1,5 +1,6 @@
 import React from 'react'
 import { useEffect } from 'react';
+
 export default function OpenGLCanvas({ exampleProp }) {
   useEffect(() => {
     const canvas = document.querySelector("#canvas")
@@ -15,7 +16,7 @@ export default function OpenGLCanvas({ exampleProp }) {
     };
 
     const script = document.createElement('script');
-    script.src = 'src/em_main.js';
+    script.src = 'src/cpp/em_main.js';
     script.async = true;
 
 

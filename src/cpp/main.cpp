@@ -5,6 +5,8 @@
 // Standard C++ Lib
 #include <iostream>
 #include <vector>
+#include <string>
+#include <fstream>
 
 // Globals
 // 
@@ -23,23 +25,26 @@ GLuint gVertexBufferObject = 0;
 // Program Object for out shaders
 GLuint gGraphicsPipelineShaderProgram = 0;
 
-const std::string gVertexShaderSource = 
-    "#version 300 es\n"
-    "in vec4 position;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(position.x, position.y, position.z, position.w);\n"
-    "}\n";
+// Globals end
+std::string LoadShaderAsString( const std::string& filename){
 
+    // REsulting shader program loaded as a single string
+    std::string result = "";
 
-const std::string gFragmentShaderSource = 
-    "#version 300 es\n"
-    "precision mediump float;\n"
-    "out vec4 color;\n"
-    "void main()\n"
-    "{\n"
-    "   color = vec4(1.0f, 0.5f, 1.0f, 0.5f);\n"
-    "}\n";
+    std::string line = ""; 
+    std::ifstream myFile(filename.c_str());
+
+    if (myFile.is_open()){
+        while(std::getline(myFile, line)){
+            result += line + '\n';
+        }
+        myFile.close();
+    }else{
+        std::cout << "Can't open a shader file: " << filename << std::endl;
+        exit(1);
+    }
+    return result;
+}
 
 
 GLuint CompileShader(GLuint type, const std::string source){
@@ -96,7 +101,9 @@ GLuint CreateShaderProgram(const std::string& vertexshadersource,
 }
 
 void CreateGraphicsPipeline(){
-    gGraphicsPipelineShaderProgram = CreateShaderProgram(gVertexShaderSource,gFragmentShaderSource);
+    std::string vertexShaderSource = LoadShaderAsString("shaders/vertex.glsl");
+    std::string fragmentShaderSource = LoadShaderAsString("shaders/fragment.glsl");
+    gGraphicsPipelineShaderProgram = CreateShaderProgram(vertexShaderSource,fragmentShaderSource);
 }
 
 void GetOpenGLVersionInfo(){
