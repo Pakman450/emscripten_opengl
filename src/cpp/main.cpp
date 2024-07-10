@@ -21,7 +21,12 @@ GLuint gVertexArrayObject = 0;
 
 //Vertex Buffer Object
 GLuint gVertexBufferObject = 0;
-GLuint gVertexBufferObject2 = 0;
+
+//Index Buffer Object
+//Stores an array of indices to draw from 
+// when we doing indexed drawing
+GLuint gIndexBufferObject = 0; 
+
 // Program Object for out shaders
 GLuint gGraphicsPipelineShaderProgram = 0;
 
@@ -118,16 +123,21 @@ void GetOpenGLVersionInfo(){
 // 
 void VertexSpecification(){
 
-    const std::vector<GLfloat> vertexPosition{
-        -0.8f, -0.8f, 0.0f, // vertex 1
-         0.8f, -0.8f, 0.0f, // vertex 2
-         0.0f,  0.8f, 0.0f, // vertex 3
-    };
+    const std::vector<GLfloat> vertexData{
+        //0 - Verteix
+        -0.5f, -0.5f, 0.0f, // vertex 1 Left
+        1.0f, 0.0f, 0.0f, // color 1
 
-    const std::vector<GLfloat> vertexColors{
-         1.0f, 0.0f, 0.0f, // vertex 1
-         0.0f, 1.0f, 0.0f, // vertex 2
-         0.0f, 0.0f, 1.0f // vertex 3
+        // 1 - vertex
+         0.5f, -0.5f, 0.0f, // vertex 2 Right
+         0.0f, 1.0f, 0.0f, // color 2
+        // 2 - vertex
+         -0.5f,  0.5f, 0.0f, // vertex 3 TOp
+         0.0f, 0.0f, 1.0f,  // color 3
+
+        // 3 - vertex
+         0.5f,  0.5f, 0.0f, // vertex 3 right
+         0.0f, 0.0f, 1.0f  // color 3
     };
 
     // We start setting things up on the GPU
@@ -140,46 +150,47 @@ void VertexSpecification(){
     glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
 
     glBufferData(GL_ARRAY_BUFFER, 
-                 vertexPosition.size()*sizeof(GLfloat),
-                 vertexPosition.data(), 
+                 vertexData.size()*sizeof(GLfloat),
+                 vertexData.data(), 
                  GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0,
-                          3, // x y z
+
+    const std::vector<GLuint> indexBufferData {2,0,1, 3,2,1};
+    // Setup the index Buffer object (IBO ie EBO)
+    glGenBuffers(1, &gIndexBufferObject);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gIndexBufferObject);
+
+    //populate our index buffer
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 indexBufferData.size()*sizeof(GLuint),
+                 indexBufferData.data(),
+                 GL_STATIC_DRAW
+                );
+
+    // No linking up the attrivutes in our VAO
+    // positions
+    glEnableVertexAttribArray(0); // The index for the Attribution array
+    glVertexAttribPointer(0, // Which should match this too...
+                          3, // x y z How many elements are there in this section?
                           GL_FLOAT,
                           GL_FALSE,
-                          0,
-                          (void*)0
+                          sizeof(GL_FLOAT)*6, // How far are we going with our in our VAO in Bytes
+                          (void*)0 // starting at index 0
                           );
 
-
-
-
-
-
-    // Start generting out VBO2
-    glGenBuffers(1, &gVertexBufferObject2);
-
-    glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject2);
-
-    glBufferData(GL_ARRAY_BUFFER, 
-                 vertexColors.size()*sizeof(GLfloat),
-                 vertexColors.data(), 
-                 GL_STATIC_DRAW);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1,
-                          3, // r g b
+    // Color information
+    glEnableVertexAttribArray(1);  // The index for the Attribution array
+    glVertexAttribPointer(1, // Which should match this too...
+                          3, // r g b. How many elements are there in this section?
                           GL_FLOAT,
                           GL_FALSE,
-                          0,
-                          (void*)0
+                          sizeof(GL_FLOAT)*6, // How far are we going with our in our VAO in Bytes
+                          (GLvoid*)(sizeof(GL_FLOAT)*3) // Where are we starting at? in Bytes
                           );
 
     glBindVertexArray(0);
 
     glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
 
 };
 
@@ -245,7 +256,26 @@ void Draw(){
     glBindVertexArray(gVertexArrayObject);
     glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    // // Draw first triangle
+    // glDrawArrays(GL_TRIANGLES, 
+    //              0, // start at index 3 of our VBO
+    //              6  // we are rendering up to 6 elements
+    //              );
+
+    // // Draw second triangle
+    // glDrawArrays(GL_TRIANGLES, 
+    //             3, //start at index 3 or the second triangle
+    //             3); // and we are rendering up to 3 elements becuase it is a triangle
+
+    
+    // Draw a quad based on index-based array drawing
+    glDrawElements(GL_TRIANGLES, 
+                 6, // number of elements in your index buffer object
+                 GL_UNSIGNED_INT, // type of data
+                 0 // no offset
+                 );
+
+    
 }
 void MainLoop(void* mainLoopArg){
 
