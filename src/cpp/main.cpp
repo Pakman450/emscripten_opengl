@@ -65,8 +65,9 @@ GLuint gIndexBufferObject = 0;
 // Program Object for out shaders
 GLuint gGraphicsPipelineShaderProgram = 0;
 
-float g_uOffset = 0.0; 
-float g_uOffsetrot =0.0;
+float g_uOffset = -2.0; 
+float g_uRotate =0.0;
+float g_uScale = 0.5;
 // Globals end
 ///////////
 
@@ -160,20 +161,56 @@ void GetOpenGLVersionInfo(){
 // 
 void VertexSpecification(){
 
-    const std::vector<GLfloat> vertexData{
+    // const std::vector<GLfloat> vertexData{
+    //     //0 - Verteix
+    //     -0.5f, -0.5f, 0.0f, // vertex 1 Left
+    //     1.0f, 0.0f, 0.0f, // color 1
+
+    //     // 1 - vertex
+    //      0.5f, -0.5f, 0.0f, // vertex 2 Right
+    //      0.0f, 1.0f, 0.0f, // color 2
+    //     // 2 - vertex
+    //      -0.5f,  0.5f, 0.0f, // vertex 3 TOp
+    //      0.0f, 0.0f, 1.0f,  // color 3
+
+    //     // 3 - vertex
+    //      0.5f,  0.5f, 0.0f, // vertex 3 right
+    //      0.0f, 0.0f, 1.0f  // color 3
+    // };
+
+
+
+        const std::vector<GLfloat> vertexCubeData{
         //0 - Verteix
-        -0.5f, -0.5f, 0.0f, // vertex 1 Left
+        -0.5f, -0.5f, 0.5f, // vertex 1 Left
         1.0f, 0.0f, 0.0f, // color 1
 
         // 1 - vertex
-         0.5f, -0.5f, 0.0f, // vertex 2 Right
+         0.5f, -0.5f, 0.5f, // vertex 2 Right
          0.0f, 1.0f, 0.0f, // color 2
+
         // 2 - vertex
-         -0.5f,  0.5f, 0.0f, // vertex 3 TOp
+         -0.5f,  0.5f, 0.5f, // vertex 3 TOp
          0.0f, 0.0f, 1.0f,  // color 3
 
         // 3 - vertex
-         0.5f,  0.5f, 0.0f, // vertex 3 right
+         0.5f,  0.5f, 0.5f, // vertex 3 right
+         0.0f, 0.0f, 1.0f,  // color 3
+
+        //4 - Verteix
+        0.5f, -0.5f, -0.5f, // vertex 1 Left
+        1.0f, 0.0f, 0.0f, // color 1
+
+        // 5 - vertex
+         0.5f, 0.5f, -0.5f, // vertex 2 Right
+         0.0f, 1.0f, 0.0f, // color 2
+
+        // 6 - vertex
+         -0.5f,  0.5f, -0.5f, // vertex 3 TOp
+         0.0f, 0.0f, 1.0f,  // color 3
+
+        // 7 - vertex
+         -0.5f,  -0.5f, -0.5f, // vertex 3 right
          0.0f, 0.0f, 1.0f  // color 3
     };
 
@@ -187,12 +224,25 @@ void VertexSpecification(){
     glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
 
     glBufferData(GL_ARRAY_BUFFER, 
-                 vertexData.size()*sizeof(GLfloat),
-                 vertexData.data(), 
+                 vertexCubeData.size()*sizeof(GLfloat),
+                 vertexCubeData.data(), 
                  GL_STATIC_DRAW);
 
 
-    const std::vector<GLuint> indexBufferData {2,0,1, 3,2,1};
+    // const std::vector<GLuint> indexBufferData {2,0,1, 3,2,1};
+    const std::vector<GLuint> indexBufferData {
+        0,1,2, 
+        2,1,3,
+
+    
+        3,1,4,
+        4,5,3,
+
+
+        4,6,5,
+        4,7,6
+        };
+
     // Setup the index Buffer object (IBO ie EBO)
     glGenBuffers(1, &gIndexBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gIndexBufferObject);
@@ -275,6 +325,23 @@ void Input(){
             std::cout <<"Good bye\n";
             gQuit = true;
         }
+        
+        // Mouse wheel event
+        if (e.type == SDL_MOUSEWHEEL) {
+            if (e.wheel.y > 0) {
+                g_uScale-=0.01;
+                std::cout << "Mouse wheel scrolled up" << std::endl;
+            } else if (e.wheel.y < 0) {
+                g_uScale+=0.01;
+                std::cout << "Mouse wheel scrolled down" << std::endl;
+            }
+
+            if (e.wheel.x > 0) {
+                std::cout << "Mouse wheel scrolled right" << std::endl;
+            } else if (e.wheel.x < 0) {
+                std::cout << "Mouse wheel scrolled left" << std::endl;
+            }
+        }
     }
 
 
@@ -289,13 +356,14 @@ void Input(){
     }
 
     if (state[SDL_SCANCODE_LEFT]){
-        g_uOffsetrot+=1;
+        g_uRotate-=1;
     }
 
     if (state[SDL_SCANCODE_RIGHT]){
-        g_uOffsetrot-=1;
+        g_uRotate+=1;
 
     }
+
 };
 
 void PreDraw(){
@@ -311,7 +379,10 @@ void PreDraw(){
     // return model transformation to transfer object into world space
     glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,0.0f,g_uOffset) );
 
-    model = glm::rotate(model, glm::radians(g_uOffsetrot), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    model = glm::rotate(model, glm::radians(g_uRotate), glm::vec3(0.0f, 1.0f, 0.0f));
+    
+    model = glm::scale(model, glm::vec3(g_uScale, g_uScale, g_uScale));
 
     //retrieve the model matrix
     GLint u_ModelMatrixLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "u_ModelMatrix");
@@ -364,6 +435,20 @@ void Draw(){
                  6, // number of elements in your index buffer object
                  GL_UNSIGNED_INT, // type of data
                  0 // no offset
+                 ););
+
+    // Draw a quad based on index-based array drawing
+    GLCheck(glDrawElements(GL_TRIANGLES, 
+                 6, // number of elements in your index buffer object
+                 GL_UNSIGNED_INT, // type of data
+                 (GLvoid*)(sizeof(GLuint)*6) // no offset
+                 ););
+
+    // Draw a quad based on index-based array drawing
+    GLCheck(glDrawElements(GL_TRIANGLES, 
+                 6, // number of elements in your index buffer object
+                 GL_UNSIGNED_INT, // type of data
+                 (GLvoid*)(sizeof(GLuint)*9) // no offset
                  ););
 
     
