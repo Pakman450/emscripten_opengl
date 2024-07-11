@@ -4,12 +4,12 @@
 EMCC = em++
 
 # Compiler flags
-CXXFLAGS = -std=c++11
+CXXFLAGS = -std=c++17
 SHADERFLAGS = --embed-file shaders --no-entry
 EMFLAGS = -s USE_SDL=2 -s FULL_ES3 -s WASM=0 -s ENVIRONMENT=web $(SHADERFLAGS)
 
 # Where the nlohmann-json libraries are
-INCLUDE =
+INCLUDE = -I$(GLMBASE)
 
 # Source files
 SOURCES = main.cpp
@@ -25,6 +25,6 @@ $(OUTPUT): $(SOURCES)
 
 # Clean target
 clean:
-	rm -f $(OUTPUT)
+	rm -f $(OUTPUT) em_main.data
 
 .PHONY: all clean

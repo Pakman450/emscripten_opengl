@@ -8,6 +8,16 @@
 #include <string>
 #include <fstream>
 
+//GLM
+#include <glm/vec4.hpp>
+#include <glm/vec3.hpp>
+
+// For glm::to_string() function
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp> 
+
+
+
 //////////
 // GlOBALS
 
@@ -52,6 +62,9 @@ GLuint gIndexBufferObject = 0;
 
 // Program Object for out shaders
 GLuint gGraphicsPipelineShaderProgram = 0;
+
+float g_uOffsety = 0.0f;
+float g_uOffsetx = 0.0f;
 
 // Globals end
 ///////////
@@ -262,6 +275,27 @@ void Input(){
             gQuit = true;
         }
     }
+
+
+    const Uint8 *state = SDL_GetKeyboardState(NULL);
+    if (state[SDL_SCANCODE_UP]){
+        g_uOffsety += 0.01f;
+        std::cout << "g_uOffsety: "<< g_uOffsety << std::endl;
+    }
+    if (state[SDL_SCANCODE_DOWN]){
+        g_uOffsety -= 0.01f;
+        std::cout << "g_uOffsety: "<< g_uOffsety << std::endl;
+
+    }
+        if (state[SDL_SCANCODE_LEFT]){
+        g_uOffsetx -= 0.01f;
+        std::cout << "g_uOffsety: "<< g_uOffsetx << std::endl;
+    }
+    if (state[SDL_SCANCODE_RIGHT]){
+        g_uOffsetx += 0.01f;
+        std::cout << "g_uOffsety: "<< g_uOffsetx << std::endl;
+
+    }
 };
 
 void PreDraw(){
@@ -271,6 +305,25 @@ void PreDraw(){
     //Yellow background
     glClearColor(1.f,1.f,0.f,1.f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+
+    GLint locationy = glGetUniformLocation(gGraphicsPipelineShaderProgram, "u_Offsety");
+    GLint locationx = glGetUniformLocation(gGraphicsPipelineShaderProgram, "u_Offsetx");
+
+    if (locationy >= 0) {
+         glUniform1f(locationy, g_uOffsety);
+         glUniform1f(locationx, g_uOffsetx);
+    } else {
+        std::cout << "Could not find u_Offsety or x, maybe mispelling\n";
+    }
+
+    // if (locationx >= 0) {
+         
+    // } else {
+    //     std::cout << "Could not find u_Offsetx, maybe mispelling\n";
+    // }
+
+
 
     glUseProgram(gGraphicsPipelineShaderProgram);
 }
@@ -294,7 +347,7 @@ void Draw(){
     // Draw a quad based on index-based array drawing
     GLCheck(glDrawElements(GL_TRIANGLES, 
                  6, // number of elements in your index buffer object
-                 GL_INT, // type of data
+                 GL_UNSIGNED_INT, // type of data
                  0 // no offset
                  ););
 
@@ -325,9 +378,8 @@ void CleanUp(){
     SDL_Quit();
 };
 
-
 int main(){
-
+    
     InitializeProgram();
 
     VertexSpecification();
