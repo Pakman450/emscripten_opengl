@@ -19,6 +19,7 @@
 #include <glm/gtx/string_cast.hpp> 
 
 #include "Sphere.h"
+#include "Cube.h"
 
 //////////
 // GlOBALS
@@ -442,6 +443,7 @@ void Draw(){
                  ););
 
     Sphere::drawSphere();
+    Cube::drawCube();
 }
 void MainLoop(void* mainLoopArg){
 

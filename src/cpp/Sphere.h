@@ -1,12 +1,12 @@
 #ifndef SPHERE_H_
 #define SPHERE_H_
 #include <vector>
+#include "Vertex.h"
+
 
 namespace Sphere
 {
-    struct Vertex;
-    struct ColorVertex;
-    extern std::vector<Vertex> generateSphere(float, int, int,ColorVertex );
+    extern std::vector<Vertex::Vertex> generateSphere(float, int, int, Vertex::Vertex );
     extern void drawSphere();
     
 } // namespace name
