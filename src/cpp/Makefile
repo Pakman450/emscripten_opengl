@@ -12,7 +12,7 @@ EMFLAGS = -s USE_SDL=2 -s FULL_ES3 -s WASM=0 -s ENVIRONMENT=web $(SHADERFLAGS)
 INCLUDE = -I$(GLMBASE)
 
 # Source files
-SOURCES = main.cpp
+SOURCES = main.cpp Sphere.cpp
 # Output file
 OUTPUT = em_main.js
 

@@ -18,7 +18,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp> 
 
-
+#include "Sphere.h"
 
 //////////
 // GlOBALS
@@ -411,24 +411,14 @@ void PreDraw(){
         exit(EXIT_FAILURE);
     }
 
+    //
+
     glUseProgram(gGraphicsPipelineShaderProgram);
 }
 
 void Draw(){
     glBindVertexArray(gVertexArrayObject);
     glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
-
-    // // Draw first triangle
-    // glDrawArrays(GL_TRIANGLES, 
-    //              0, // start at index 3 of our VBO
-    //              6  // we are rendering up to 6 elements
-    //              );
-
-    // // Draw second triangle
-    // glDrawArrays(GL_TRIANGLES, 
-    //             3, //start at index 3 or the second triangle
-    //             3); // and we are rendering up to 3 elements becuase it is a triangle
-
 
     // Draw a quad based on index-based array drawing
     GLCheck(glDrawElements(GL_TRIANGLES, 
@@ -451,7 +441,7 @@ void Draw(){
                  (GLvoid*)(sizeof(GLuint)*9) // no offset
                  ););
 
-    
+    Sphere::drawSphere();
 }
 void MainLoop(void* mainLoopArg){
 
