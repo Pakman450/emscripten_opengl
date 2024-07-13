@@ -20,6 +20,7 @@
 
 #include "Sphere.h"
 #include "Cube.h"
+#include "Camera.hpp"
 
 //////////
 // GlOBALS
@@ -69,6 +70,9 @@ GLuint gGraphicsPipelineShaderProgram = 0;
 float g_uOffset = -2.0; 
 float g_uRotate =0.0;
 float g_uScale = 0.5;
+
+//Create a single global camera
+Camera gCamera;
 // Globals end
 ///////////
 
@@ -162,58 +166,58 @@ void GetOpenGLVersionInfo(){
 // 
 void VertexSpecification(){
 
-    // const std::vector<GLfloat> vertexData{
-    //     //0 - Verteix
-    //     -0.5f, -0.5f, 0.0f, // vertex 1 Left
-    //     1.0f, 0.0f, 0.0f, // color 1
-
-    //     // 1 - vertex
-    //      0.5f, -0.5f, 0.0f, // vertex 2 Right
-    //      0.0f, 1.0f, 0.0f, // color 2
-    //     // 2 - vertex
-    //      -0.5f,  0.5f, 0.0f, // vertex 3 TOp
-    //      0.0f, 0.0f, 1.0f,  // color 3
-
-    //     // 3 - vertex
-    //      0.5f,  0.5f, 0.0f, // vertex 3 right
-    //      0.0f, 0.0f, 1.0f  // color 3
-    // };
-
-
-
-        const std::vector<GLfloat> vertexCubeData{
+    const std::vector<GLfloat> vertexData{
         //0 - Verteix
-        -0.5f, -0.5f, 0.5f, // vertex 1 Left
+        -0.5f, -0.5f, 0.0f, // vertex 1 Left
         1.0f, 0.0f, 0.0f, // color 1
 
         // 1 - vertex
-         0.5f, -0.5f, 0.5f, // vertex 2 Right
+         0.5f, -0.5f, 0.0f, // vertex 2 Right
          0.0f, 1.0f, 0.0f, // color 2
-
         // 2 - vertex
-         -0.5f,  0.5f, 0.5f, // vertex 3 TOp
+         -0.5f,  0.5f, 0.0f, // vertex 3 TOp
          0.0f, 0.0f, 1.0f,  // color 3
 
         // 3 - vertex
-         0.5f,  0.5f, 0.5f, // vertex 3 right
-         0.0f, 0.0f, 1.0f,  // color 3
-
-        //4 - Verteix
-        0.5f, -0.5f, -0.5f, // vertex 1 Left
-        1.0f, 0.0f, 0.0f, // color 1
-
-        // 5 - vertex
-         0.5f, 0.5f, -0.5f, // vertex 2 Right
-         0.0f, 1.0f, 0.0f, // color 2
-
-        // 6 - vertex
-         -0.5f,  0.5f, -0.5f, // vertex 3 TOp
-         0.0f, 0.0f, 1.0f,  // color 3
-
-        // 7 - vertex
-         -0.5f,  -0.5f, -0.5f, // vertex 3 right
+         0.5f,  0.5f, 0.0f, // vertex 3 right
          0.0f, 0.0f, 1.0f  // color 3
     };
+
+
+
+    //     const std::vector<GLfloat> vertexCubeData{
+    //     //0 - Verteix
+    //     -0.5f, -0.5f, 0.5f, // vertex 1 Left
+    //     1.0f, 0.0f, 0.0f, // color 1
+
+    //     // 1 - vertex
+    //      0.5f, -0.5f, 0.5f, // vertex 2 Right
+    //      0.0f, 1.0f, 0.0f, // color 2
+
+    //     // 2 - vertex
+    //      -0.5f,  0.5f, 0.5f, // vertex 3 TOp
+    //      0.0f, 0.0f, 1.0f,  // color 3
+
+    //     // 3 - vertex
+    //      0.5f,  0.5f, 0.5f, // vertex 3 right
+    //      0.0f, 0.0f, 1.0f,  // color 3
+
+    //     //4 - Verteix
+    //     0.5f, -0.5f, -0.5f, // vertex 1 Left
+    //     1.0f, 0.0f, 0.0f, // color 1
+
+    //     // 5 - vertex
+    //      0.5f, 0.5f, -0.5f, // vertex 2 Right
+    //      0.0f, 1.0f, 0.0f, // color 2
+
+    //     // 6 - vertex
+    //      -0.5f,  0.5f, -0.5f, // vertex 3 TOp
+    //      0.0f, 0.0f, 1.0f,  // color 3
+
+    //     // 7 - vertex
+    //      -0.5f,  -0.5f, -0.5f, // vertex 3 right
+    //      0.0f, 0.0f, 1.0f  // color 3
+    // };
 
     // We start setting things up on the GPU
     glGenVertexArrays(1, &gVertexArrayObject);
@@ -225,24 +229,24 @@ void VertexSpecification(){
     glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
 
     glBufferData(GL_ARRAY_BUFFER, 
-                 vertexCubeData.size()*sizeof(GLfloat),
-                 vertexCubeData.data(), 
+                 vertexData.size()*sizeof(GLfloat),
+                 vertexData.data(), 
                  GL_STATIC_DRAW);
 
 
-    // const std::vector<GLuint> indexBufferData {2,0,1, 3,2,1};
-    const std::vector<GLuint> indexBufferData {
-        0,1,2, 
-        2,1,3,
+    const std::vector<GLuint> indexBufferData {2,0,1, 3,2,1};
+    // const std::vector<GLuint> indexBufferData {
+    //     0,1,2, 
+    //     2,1,3,
 
     
-        3,1,4,
-        4,5,3,
+    //     3,1,4,
+    //     4,5,3,
 
 
-        4,6,5,
-        4,7,6
-        };
+    //     4,6,5,
+    //     4,7,6
+    //     };
 
     // Setup the index Buffer object (IBO ie EBO)
     glGenBuffers(1, &gIndexBufferObject);
@@ -343,26 +347,29 @@ void Input(){
                 std::cout << "Mouse wheel scrolled left" << std::endl;
             }
         }
+
+        if (e.type == SDL_MOUSEMOTION){
+            gCamera.MouseLook(e.motion.xrel,e.motion.yrel);
+        }
     }
 
-
+    float speed = 0.1f;
     const Uint8 *state = SDL_GetKeyboardState(NULL);
     if (state[SDL_SCANCODE_UP]){
-        g_uOffset+=0.01;
+        gCamera.MoveFoward(speed);
     }
 
     if (state[SDL_SCANCODE_DOWN]){
-        g_uOffset-=0.01;
+        gCamera.MoveBackward(speed);
 
     }
 
     if (state[SDL_SCANCODE_LEFT]){
-        g_uRotate-=1;
+        gCamera.MoveLeft(speed);
     }
 
     if (state[SDL_SCANCODE_RIGHT]){
-        g_uRotate+=1;
-
+        gCamera.MoveRight(speed);
     }
 
 };
@@ -376,7 +383,11 @@ void PreDraw(){
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 
-    //
+
+
+
+    g_uRotate-=1.0f;
+    
     // return model transformation to transfer object into world space
     glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,0.0f,g_uOffset) );
 
@@ -395,7 +406,22 @@ void PreDraw(){
         exit(EXIT_FAILURE);
     }
 
+    glm::mat4 view        = gCamera.GetViewMatrix();
         
+    //retrieve the perspective matrix uniform
+    GLint u_ViewLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "u_ViewMatrix");
+
+    if (u_ViewLocation >= 0) {
+         glUniformMatrix4fv(u_ViewLocation, 1, GL_FALSE, &view[0][0]);
+    } else {
+        std::cout << "Could not find u_ViewMatrix, maybe mispelling\n";
+        exit(EXIT_FAILURE);
+    }
+
+
+
+
+
     // Projection matrix 
     glm::mat4 perspective = glm::perspective(glm::radians(45.0f),
                                              (float)gScreenWidth/(float)gScreenHeight,
@@ -419,7 +445,7 @@ void PreDraw(){
 
 void Draw(){
     glBindVertexArray(gVertexArrayObject);
-    glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
+    // // glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
 
     // Draw a quad based on index-based array drawing
     GLCheck(glDrawElements(GL_TRIANGLES, 
@@ -428,22 +454,22 @@ void Draw(){
                  0 // no offset
                  ););
 
-    // Draw a quad based on index-based array drawing
-    GLCheck(glDrawElements(GL_TRIANGLES, 
-                 6, // number of elements in your index buffer object
-                 GL_UNSIGNED_INT, // type of data
-                 (GLvoid*)(sizeof(GLuint)*6) // no offset
-                 ););
+    // // Draw a quad based on index-based array drawing
+    // GLCheck(glDrawElements(GL_TRIANGLES, 
+    //              6, // number of elements in your index buffer object
+    //              GL_UNSIGNED_INT, // type of data
+    //              (GLvoid*)(sizeof(GLuint)*6) // no offset
+    //              ););
 
-    // Draw a quad based on index-based array drawing
-    GLCheck(glDrawElements(GL_TRIANGLES, 
-                 6, // number of elements in your index buffer object
-                 GL_UNSIGNED_INT, // type of data
-                 (GLvoid*)(sizeof(GLuint)*9) // no offset
-                 ););
+    // // Draw a quad based on index-based array drawing
+    // GLCheck(glDrawElements(GL_TRIANGLES, 
+    //              6, // number of elements in your index buffer object
+    //              GL_UNSIGNED_INT, // type of data
+    //              (GLvoid*)(sizeof(GLuint)*9) // no offset
+    //              ););
 
-    Sphere::drawSphere();
-    Cube::drawCube();
+    // Sphere::drawSphere();
+    // Cube::drawCube();
 }
 void MainLoop(void* mainLoopArg){
 

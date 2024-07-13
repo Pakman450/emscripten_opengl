@@ -14,14 +14,15 @@ layout(location=1) in vec3 vertexColors;
 // uniform float u_Offsetx; // uniform variable
 uniform mat4 u_ModelMatrix;
 uniform mat4 u_Projection; 
+uniform mat4 u_ViewMatrix;
 
 
 out vec3 v_vertexColors;
 
 void main()
 {
-
-   vec4 newPosition = u_Projection * u_ModelMatrix * vec4(position,1.0f);
+   // the M V P matrix. Model -> View -> Projection
+   vec4 newPosition = u_Projection * u_ViewMatrix * u_ModelMatrix * vec4(position,1.0f);
                                                                      // dont forget w
    gl_Position = vec4(newPosition.x, newPosition.y, newPosition.z, newPosition.w);
 
