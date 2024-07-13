@@ -14,6 +14,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/mat4x4.hpp>
 
+
 // For glm::to_string() function
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp> 
@@ -320,9 +321,15 @@ void InitializeProgram(){
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     GetOpenGLVersionInfo();
+
+    SDL_WarpMouseInWindow(gGraphicsApplicationWindow, gScreenWidth/2, gScreenHeight/2);
+    SDL_SetRelativeMouseMode(SDL_TRUE);
 };
 
 void Input(){
+
+    static int mouseX = gScreenWidth/2;
+    static int mouseY = gScreenHeight/2;
 
     SDL_Event e;
     while(SDL_PollEvent(&e) !=0){
@@ -349,7 +356,10 @@ void Input(){
         }
 
         if (e.type == SDL_MOUSEMOTION){
-            gCamera.MouseLook(e.motion.xrel,e.motion.yrel);
+            mouseX += e.motion.xrel;
+            mouseY += e.motion.yrel;
+
+            gCamera.MouseLook(mouseX,mouseY);
         }
     }
 
@@ -506,7 +516,7 @@ int main(){
 
 
     void* mainLoopArg = nullptr;
-
+    
     #ifdef __EMSCRIPTEN__
         int fps = 0; // Use browser's requestAnimationFrame
         emscripten_set_main_loop_arg(MainLoop, mainLoopArg,  fps, true);
