@@ -33,7 +33,7 @@ void Camera::MouseLook(int mouseX,int mouseY){
     glm::vec2 mouseDelta = mOldMousePosition - currentMouse; 
 
 
-    mViewDirection = glm::rotate(mViewDirection, glm::radians((float) mouseDelta.x) ,mUpVector );
+    mViewDirection = glm::rotate(mViewDirection, glm::radians((float) mouseDelta.x)/10 ,mUpVector );
     mOldMousePosition = currentMouse;
 }
 void Camera::MoveFoward(float speed){

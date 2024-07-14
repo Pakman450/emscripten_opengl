@@ -60,6 +60,9 @@ GLuint gVertexArrayObject = 0;
 //Vertex Buffer Object
 GLuint gVertexBufferObject = 0;
 
+
+GLuint gAxisVBO = 0;
+
 //Index Buffer Object
 //Stores an array of indices to draw from 
 // when we doing indexed drawing
@@ -76,6 +79,113 @@ float g_uScale = 0.5;
 Camera gCamera;
 // Globals end
 ///////////
+
+void drawAxes() {
+    // Interleaved position and color data for three vertices
+    const std::vector<GLfloat> axesData{
+        // Vertex 1 (Position: x, y, z, Color: r, g, b)
+        0.0f, 0.0f, 0.0f, // Vertex position (origin)
+        1.0f, 0.0f, 0.0f, // Vertex color (red)
+        
+        // Vertex 2 (Position: x, y, z, Color: r, g, b)
+        1.0f, 0.0f, 0.0f, // Vertex position (right)
+        1.0f, 0.0f, 0.0f, // Vertex color (red)
+        
+        // Vertex 3 (Position: x, y, z, Color: r, g, b)
+        0.0f, 0.0f, 0.0f, // Vertex position (origin)
+        0.0f, 1.0f, 0.0f, // Vertex color (green)
+        
+        // Vertex 4 (Position: x, y, z, Color: r, g, b)
+        0.0f, 1.0f, 0.0f, // Vertex position (top)
+        0.0f, 1.0f, 0.0f, // Vertex color (green)
+        
+        // Vertex 5 (Position: x, y, z, Color: r, g, b)
+        0.0f, 0.0f, 0.0f, // Vertex position (origin)
+        0.0f, 0.0f, 1.0f, // Vertex color (blue)
+        
+        // Vertex 6 (Position: x, y, z, Color: r, g, b)
+        0.0f, 0.0f, 1.0f, // Vertex position (forward)
+        0.0f, 0.0f, 1.0f, // Vertex color (blue)
+    };
+
+    GLuint AxesArrayObject, AxesBufferObject;
+    
+    // Generate and bind the Vertex Array Object
+    glGenVertexArrays(1, &AxesArrayObject);
+    glBindVertexArray(AxesArrayObject);
+    
+    // Generate and bind the Vertex Buffer Object
+    glGenBuffers(1, &AxesBufferObject);
+    glBindBuffer(GL_ARRAY_BUFFER, AxesBufferObject);
+    
+    // Buffer the data
+    glBufferData(GL_ARRAY_BUFFER, 
+                 axesData.size() * sizeof(GLfloat), 
+                 axesData.data(), 
+                 GL_STATIC_DRAW);
+    
+    // Enable and set the position attribute pointer
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * sizeof(GLfloat), (void*)0);
+    
+    // Enable and set the color attribute pointer
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    
+    
+    // return model transformation to transfer object into world space
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,0.0f,0.0f) );
+
+    //retrieve the model matrix
+    GLint u_ModelMatrixLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "u_ModelMatrix");
+
+    if (u_ModelMatrixLocation >= 0) {
+         glUniformMatrix4fv(u_ModelMatrixLocation, 1, false, &model[0][0]);
+    } else {
+        std::cout << "Could not find u_ModelMatrix, maybe mispelling\n";
+        exit(EXIT_FAILURE);
+    }
+
+    glm::mat4 view        = gCamera.GetViewMatrix();
+        
+    //retrieve the perspective matrix uniform
+    GLint u_ViewLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "u_ViewMatrix");
+
+    if (u_ViewLocation >= 0) {
+         glUniformMatrix4fv(u_ViewLocation, 1, false, &view[0][0]);
+    } else {
+        std::cout << "Could not find u_ViewMatrix, maybe mispelling\n";
+        exit(EXIT_FAILURE);
+    }
+
+    // Projection matrix 
+    glm::mat4 perspective = glm::perspective(glm::radians(45.0f),
+                                             (float)gScreenWidth/(float)gScreenHeight,
+                                             0.1f, 
+                                             10.0f);
+
+    //retrieve the perspective matrix uniform
+    GLint u_ProjectionLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "u_Projection");
+
+    if (u_ProjectionLocation >= 0) {
+         glUniformMatrix4fv(u_ProjectionLocation, 1, false, &perspective[0][0]);
+    } else {
+        std::cout << "Could not find u_Perspective, maybe mispelling\n";
+        exit(EXIT_FAILURE);
+    }
+
+
+
+    // Draw the axes
+    glDrawArrays(GL_LINES, 0, axesData.size() / 6);
+    
+    // Unbind the Vertex Array Object
+    glBindVertexArray(0);
+    
+    // Delete the buffers (if needed to keep, remove these lines)
+    glDeleteBuffers(1, &AxesBufferObject);
+    glDeleteVertexArrays(1, &AxesArrayObject);
+}
 
 std::string LoadShaderAsString( const std::string& filename){
 
@@ -266,8 +376,8 @@ void VertexSpecification(){
     glVertexAttribPointer(0, // Which should match this too...
                           3, // x y z How many elements are there in this section?
                           GL_FLOAT,
-                          GL_FALSE,
-                          sizeof(GL_FLOAT)*6, // How far are we going with our in our VAO in Bytes
+                          false,
+                          sizeof(GLfloat)*6, // How far are we going with our in our VAO in Bytes
                           (void*)0 // starting at index 0
                           );
 
@@ -276,9 +386,9 @@ void VertexSpecification(){
     glVertexAttribPointer(1, // Which should match this too...
                           3, // r g b. How many elements are there in this section?
                           GL_FLOAT,
-                          GL_FALSE,
-                          sizeof(GL_FLOAT)*6, // How far are we going with our in our VAO in Bytes
-                          (GLvoid*)(sizeof(GL_FLOAT)*3) // Where are we starting at? in Bytes
+                          false,
+                          sizeof(GLfloat)*6, // How far are we going with our in our VAO in Bytes
+                          (GLvoid*)(sizeof(GLfloat)*3) // Where are we starting at? in Bytes
                           );
 
     glBindVertexArray(0);
@@ -322,14 +432,14 @@ void InitializeProgram(){
 
     GetOpenGLVersionInfo();
 
-    SDL_WarpMouseInWindow(gGraphicsApplicationWindow, gScreenWidth/2, gScreenHeight/2);
-    SDL_SetRelativeMouseMode(SDL_TRUE);
+    SDL_WarpMouseInWindow(gGraphicsApplicationWindow, gScreenWidth, gScreenHeight);
+    SDL_SetRelativeMouseMode(SDL_FALSE);
 };
 
 void Input(){
 
-    static int mouseX = gScreenWidth/2;
-    static int mouseY = gScreenHeight/2;
+    static int mouseX = gScreenWidth;
+    static int mouseY = gScreenHeight;
 
     SDL_Event e;
     while(SDL_PollEvent(&e) !=0){
@@ -365,20 +475,20 @@ void Input(){
 
     float speed = 0.1f;
     const Uint8 *state = SDL_GetKeyboardState(NULL);
-    if (state[SDL_SCANCODE_UP]){
+    if (state[SDL_SCANCODE_W]){
         gCamera.MoveFoward(speed);
     }
 
-    if (state[SDL_SCANCODE_DOWN]){
+    if (state[SDL_SCANCODE_S]){
         gCamera.MoveBackward(speed);
 
     }
 
-    if (state[SDL_SCANCODE_LEFT]){
+    if (state[SDL_SCANCODE_A]){
         gCamera.MoveLeft(speed);
     }
 
-    if (state[SDL_SCANCODE_RIGHT]){
+    if (state[SDL_SCANCODE_D]){
         gCamera.MoveRight(speed);
     }
 
@@ -392,14 +502,10 @@ void PreDraw(){
     glClearColor(1.f,1.f,0.f,1.f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-
-
-
-
     g_uRotate-=1.0f;
     
     // return model transformation to transfer object into world space
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,0.0f,g_uOffset) );
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,0.0f,0.0f) );
 
 
     model = glm::rotate(model, glm::radians(g_uRotate), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -410,7 +516,7 @@ void PreDraw(){
     GLint u_ModelMatrixLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "u_ModelMatrix");
 
     if (u_ModelMatrixLocation >= 0) {
-         glUniformMatrix4fv(u_ModelMatrixLocation, 1, GL_FALSE, &model[0][0]);
+         glUniformMatrix4fv(u_ModelMatrixLocation, 1, false, &model[0][0]);
     } else {
         std::cout << "Could not find u_ModelMatrix, maybe mispelling\n";
         exit(EXIT_FAILURE);
@@ -422,15 +528,11 @@ void PreDraw(){
     GLint u_ViewLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "u_ViewMatrix");
 
     if (u_ViewLocation >= 0) {
-         glUniformMatrix4fv(u_ViewLocation, 1, GL_FALSE, &view[0][0]);
+         glUniformMatrix4fv(u_ViewLocation, 1, false, &view[0][0]);
     } else {
         std::cout << "Could not find u_ViewMatrix, maybe mispelling\n";
         exit(EXIT_FAILURE);
     }
-
-
-
-
 
     // Projection matrix 
     glm::mat4 perspective = glm::perspective(glm::radians(45.0f),
@@ -442,13 +544,12 @@ void PreDraw(){
     GLint u_ProjectionLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "u_Projection");
 
     if (u_ProjectionLocation >= 0) {
-         glUniformMatrix4fv(u_ProjectionLocation, 1, GL_FALSE, &perspective[0][0]);
+         glUniformMatrix4fv(u_ProjectionLocation, 1, false, &perspective[0][0]);
     } else {
         std::cout << "Could not find u_Perspective, maybe mispelling\n";
         exit(EXIT_FAILURE);
     }
 
-    //
 
     glUseProgram(gGraphicsPipelineShaderProgram);
 }
@@ -480,13 +581,19 @@ void Draw(){
 
     // Sphere::drawSphere();
     // Cube::drawCube();
+
+
+    // This is where we draw the XYZ axes for reference 
+    drawAxes();
 }
 void MainLoop(void* mainLoopArg){
-
+    
     glClear(GL_COLOR_BUFFER_BIT);
 
     // User input
     Input();
+
+    
 
     //prior to drawiing
     PreDraw();

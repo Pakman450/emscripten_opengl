@@ -77,10 +77,10 @@ namespace Sphere
 
         // Specify the layout of the vertex data
         glEnableVertexAttribArray(0); // Position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex::Vertex), (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(Vertex::Vertex), (void*)0);
 
         glEnableVertexAttribArray(1); // Color attribute
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex::Vertex), (void*)(sizeof(float) * 3));
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(Vertex::Vertex), (void*)(sizeof(float) * 3));
 
         // Draw the sphere
         glDrawElements(GL_TRIANGLES, sphereIndices.size(), GL_UNSIGNED_INT, 0);
